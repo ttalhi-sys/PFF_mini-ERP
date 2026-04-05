@@ -1,6 +1,13 @@
 "use client"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
     LayoutDashboard,
     Wrench,
@@ -11,7 +18,8 @@ import {
     Ticket,
     BarChart3,
     Settings2,
-    Hexagon // Using Hexagon as a placeholder for the small blue icon
+    Hexagon, // Using Hexagon as a placeholder for the small blue icon
+    LogOut
 } from "lucide-react"
 
 const mainNavItems = [
@@ -31,6 +39,14 @@ const adminNavItems = [
 
 export default function Sidebar() {
     const pathname = usePathname()
+    const router = useRouter()
+
+    const handleLogout = async () => {
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.push("/login")
+        router.refresh()
+    }
 
     const renderItem = (item: { href: string; label: string; icon: React.ElementType }) => {
         // Exact match for dashboard, partial for others to keep them highlighted across sub-routes
@@ -80,15 +96,26 @@ export default function Sidebar() {
             </div>
 
             {/* User Section Bottom */}
-            <div className="p-4 border-t border-gray-800 flex items-center justify-center lg:justify-start gap-3 bg-[#111827] shrink-0">
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-medium text-white">NT</span>
-                </div>
-                <div className="hidden lg:flex flex-col overflow-hidden">
-                    <span className="text-sm font-medium text-white truncate">Nadir Talhi</span>
-                    <span className="text-xs text-gray-400 truncate">Administrateur</span>
-                </div>
-            </div>
+            <DropdownMenu>
+                {/* @ts-expect-error Radix UI asChild type mismatch */}
+                <DropdownMenuTrigger asChild>
+                    <div className="p-4 border-t border-gray-800 flex items-center justify-center lg:justify-start gap-3 bg-[#111827] shrink-0 cursor-pointer hover:bg-gray-800/50 transition-colors outline-none">
+                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                            <span className="text-sm font-medium text-white">NT</span>
+                        </div>
+                        <div className="hidden lg:flex flex-col overflow-hidden">
+                            <span className="text-sm font-medium text-white truncate">Nadir Talhi</span>
+                            <span className="text-xs text-gray-400 truncate">Administrateur</span>
+                        </div>
+                    </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" side="right" className="w-48 ml-2">
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Se déconnecter</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </aside>
     )
 }

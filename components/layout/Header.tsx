@@ -1,12 +1,19 @@
 "use client"
-import { usePathname } from "next/navigation"
-import { Search, ChevronDown } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Search, ChevronDown, LogOut } from "lucide-react"
 import { NotificationBell } from "./NotificationBell"
 import { createClient } from "@/lib/supabase/client"
 import { useEffect, useState } from "react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Header() {
     const pathname = usePathname()
+    const router = useRouter()
 
     // Basic breadcrumb generation for demo purposes
     const getBreadcrumbs = () => {
@@ -27,6 +34,13 @@ export default function Header() {
     }
 
     const [userId, setUserId] = useState<string | null>(null)
+
+    const handleLogout = async () => {
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.push("/login")
+        router.refresh()
+    }
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -65,16 +79,27 @@ export default function Header() {
 
                 <div className="h-6 w-px bg-gray-200 mx-1"></div>
 
-                {/* User Dropdown Profile (Simple Visual Repr) */}
-                <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                        <span className="text-sm font-medium text-white">NT</span>
-                    </div>
-                    <div className="hidden sm:flex flex-col xs:hidden">
-                        <span className="text-sm font-medium text-gray-700 leading-none">Nadir Talhi</span>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                </div>
+                {/* User Dropdown Profile Menu */}
+                <DropdownMenu>
+                    {/* @ts-expect-error Radix UI asChild type mismatch */}
+                    <DropdownMenuTrigger asChild>
+                        <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1.5 rounded-md transition-colors outline-none">
+                            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                                <span className="text-sm font-medium text-white">NT</span>
+                            </div>
+                            <div className="hidden sm:flex flex-col xs:hidden">
+                                <span className="text-sm font-medium text-gray-700 leading-none">Nadir Talhi</span>
+                            </div>
+                            <ChevronDown className="w-4 h-4 text-gray-400" />
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Se déconnecter</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </header>
     )
