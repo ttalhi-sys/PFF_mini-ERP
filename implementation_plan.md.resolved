@@ -1,0 +1,56 @@
+# Application Layout Implementation
+
+This plan details the implementation of the main application layout, including the Sidebar, Header, Authentication layout, and a reusable StatusBadge component. It is based precisely on the provided requirements matching the LabGFHA dashboard design.
+
+## Proposed Changes
+
+### Configuration
+#### [MODIFY] [tailwind.config.ts](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/tailwind.config.ts)
+- Ensure colors such as `#111827`, `#1E40AF`, `#e5e7eb`, `#9ca3af` are available or just use tailwind default classes (e.g. `gray-900`, `blue-800`, `gray-200`, `gray-400`). We will use Tailwind's default palette which matches these hex codes.
+
+---
+
+### Layout Components
+#### [MODIFY] [Sidebar.tsx](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/components/layout/Sidebar.tsx)
+- Create a dark sidebar (`bg-gray-900`/`#111827`), 240px wide (`w-60`), fixed height (`h-screen`), fixed position.
+- Add LabGFHA logo configuration.
+- Add navigation links using `lucide-react` icons. Focus on responsive behavior (collapse on `< 1024px` / `lg:` breakpoint).
+- Use `usePathname` from `next/navigation` to detect current active route and apply active styles (blue background, white text, 3px white left border).
+
+#### [MODIFY] [Header.tsx](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/components/layout/Header.tsx)
+- Create a white header, 64px height (`h-16`), with a bottom border (`border-b border-gray-200`).
+- Implement dynamic breadcrumbs on the left.
+- Implement search input, notification bell with badge ("3"), and user avatar dropdown on the right.
+
+---
+
+### Page Layouts
+#### [MODIFY] [app/(dashboard)/layout.tsx](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/app/(dashboard)/layout.tsx)
+- Combine Sidebar and Header.
+- Set up the structure: Sidebar fixed left, Header fixed top.
+- Scrollable content area with `bg-gray-100` (`#F3F4F6`) and `p-6` (`24px` padding).
+
+#### [MODIFY] [app/(auth)/layout.tsx](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/app/(auth)/layout.tsx)
+- Create a simplified centered layout for authentication, removing Sidebar and Header.
+
+---
+
+### Shared Components
+#### [MODIFY] [StatusBadge.tsx](file:///c:/Users/Moi/Desktop/PFE_/5/APP_/components/shared/StatusBadge.tsx)
+- Implement a reusable badge using a record of status mappings to specific background and text colors.
+- Use a rounded pill shape (`rounded-full px-2.5 py-0.5 text-xs font-medium`).
+
+## Verification Plan
+
+### Automated Tests
+- None currently specified in codebase; relying on component rendering.
+
+### Manual Verification
+1. Run the local development server using `npm run dev`.
+2. Open localhost in a browser.
+3. Validate sidebar rendering (dark theme, logo, nav items).
+4. Verify navigation highlights correctly when clicking routes.
+5. Resize window to `< 1024px` to ensure the sidebar collapses.
+6. Check Header layout, including breadcrumbs, search bar, and notification badge.
+7. Navigate to `/login` (auth route) and verify the layout is empty/centered.
+8. Use browser screenshot to capture the final rendered dashboard layout.

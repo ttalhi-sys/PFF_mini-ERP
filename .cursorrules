@@ -1,0 +1,13 @@
+RULES:
+1. This project is a Mini-ERP for a university laboratory called LabGFHA
+2. Tech stack: Next.js 14+ App Router, TypeScript strict, Tailwind CSS, shadcn/ui, Supabase
+3. Always use the Supabase clients from /lib/supabase/ — never create new clients
+4. Always validate inputs with Zod schemas from /lib/validators/
+5. Always use TypeScript types from /lib/types/
+6. Never modify the folder structure without explicit approval
+7. Never change CSS framework — stay on Tailwind + shadcn/ui
+8. Business logic goes in /lib/business-logic/, never in components
+9. Every page must handle 3 states: loading (skeleton), error (message), empty (empty state)
+10. Use the Stitch MCP server to pull designs for each page before implementing
+11. The Supabase database is already created with all tables, RLS policies, triggers and seed data
+12. Always commit after each functional component or page

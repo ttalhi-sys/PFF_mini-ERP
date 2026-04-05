@@ -1,0 +1,53 @@
+﻿components/helpdesk/TicketDetail.tsx(30,17): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"En cours"' have no overlap.
+components/helpdesk/TicketDetail.tsx(35,17): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"R├®solu"' have no overlap.
+components/helpdesk/TicketDetail.tsx(39,17): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"Cl├┤tur├®"' have no overlap.
+components/helpdesk/TicketDetail.tsx(85,9): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"Ouvert"' have no overlap.
+components/helpdesk/TicketDetail.tsx(86,65): error TS2820: Type '"Assign├®"' is not assignable to type 'TicketStatus'. Did you mean '"ASSIGNE"'?
+components/helpdesk/TicketDetail.tsx(87,16): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"Assign├®"' have no overlap.
+components/helpdesk/TicketDetail.tsx(88,57): error TS2820: Type '"En cours"' is not assignable to type 'TicketStatus'. Did you mean '"EN_COURS"'?
+components/helpdesk/TicketDetail.tsx(89,16): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"En cours"' have no overlap.
+components/helpdesk/TicketDetail.tsx(90,57): error TS2820: Type '"R├®solu"' is not assignable to type 'TicketStatus'. Did you mean '"RESOLU"'?
+components/helpdesk/TicketDetail.tsx(91,16): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"R├®solu"' have no overlap.
+components/helpdesk/TicketDetail.tsx(92,55): error TS2322: Type '"Cl├┤tur├®"' is not assignable to type 'TicketStatus'.
+components/helpdesk/TicketDetail.tsx(136,27): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"R├®solu"' have no overlap.
+components/helpdesk/TicketDetail.tsx(136,57): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"Cl├┤tur├®"' have no overlap.
+components/helpdesk/TicketDetail.tsx(263,27): error TS2367: This comparison appears to be unintentional because the types 'TicketStatus' and '"Cl├┤tur├®"' have no overlap.
+components/maintenance/Badges.tsx(11,9): error TS2353: Object literal may only specify known properties, and 'new' does not exist in type 'Record<WorkOrderStatus, string>'.
+components/maintenance/Badges.tsx(20,9): error TS2353: Object literal may only specify known properties, and 'new' does not exist in type 'Record<WorkOrderStatus, string>'.
+components/maintenance/Badges.tsx(37,9): error TS2353: Object literal may only specify known properties, and 'preventive' does not exist in type 'Record<WorkOrderType, string>'.
+components/maintenance/Badges.tsx(45,9): error TS2353: Object literal may only specify known properties, and 'preventive' does not exist in type 'Record<WorkOrderType, string>'.
+components/maintenance/Badges.tsx(61,9): error TS2353: Object literal may only specify known properties, and 'Critique' does not exist in type 'Record<WorkOrderPriority, { bg: string; dot: string; }>'.
+components/maintenance/WorkOrderDetail.tsx(103,25): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"completed"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(104,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"blocked"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(105,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"closed"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(106,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"in_progress"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(114,40): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"completed"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(116,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"in_progress"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(117,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"completed"' have no overlap.
+components/maintenance/WorkOrderDetail.tsx(118,30): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"blocked"' have no overlap.
+components/maintenance/WorkOrderKanban.tsx(18,11): error TS2322: Type '"new"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderKanban.tsx(19,11): error TS2322: Type '"planned"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderKanban.tsx(20,11): error TS2322: Type '"in_progress"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderKanban.tsx(21,11): error TS2322: Type '"blocked"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderKanban.tsx(22,11): error TS2322: Type '"completed"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderKanban.tsx(23,11): error TS2322: Type '"closed"' is not assignable to type 'WorkOrderStatus'.
+components/maintenance/WorkOrderTable.tsx(88,38): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"new"' have no overlap.
+components/maintenance/WorkOrderTable.tsx(88,61): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"planned"' have no overlap.
+components/maintenance/WorkOrderTable.tsx(151,54): error TS2367: This comparison appears to be unintentional because the types 'WorkOrderStatus' and '"in_progress"' have no overlap.
+components/sst/IncidentDetail.tsx(99,22): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"reported"' have no overlap.
+components/sst/IncidentDetail.tsx(105,22): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"investigating"' have no overlap.
+components/sst/IncidentDetail.tsx(111,22): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"action_required"' have no overlap.
+components/sst/IncidentDetail.tsx(126,22): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"resolved"' have no overlap.
+components/sst/IncidentTable.tsx(44,22): error TS7053: Element implicitly has an 'any' type because expression of type 'IncidentStatus' can't be used to index type '{ reported: { label: string; class: string; }; investigating: { label: string; class: string; }; action_required: { label: string; class: string; }; resolved: { label: string; class: string; }; closed: { label: string; class: string; }; }'.
+  Property 'CLOTURE' does not exist on type '{ reported: { label: string; class: string; }; investigating: { label: string; class: string; }; action_required: { label: string; class: string; }; resolved: { label: string; class: string; }; closed: { label: string; class: string; }; }'.
+components/sst/IncidentTable.tsx(56,33): error TS2551: Property 'INCIDENT' does not exist on type '{ incident: { label: string; class: string; }; near_miss: { label: string; class: string; }; observation: { label: string; class: string; }; }'. Did you mean 'incident'?
+components/sst/IncidentTable.tsx(69,44): error TS2551: Property 'FAIBLE' does not exist on type '{ Critique: string; ├ëlev├®e: string; Moyenne: string; Faible: string; }'. Did you mean 'Faible'?
+components/sst/IncidentTable.tsx(69,87): error TS2551: Property 'FAIBLE' does not exist on type '{ Critique: string; ├ëlev├®e: string; Moyenne: string; Faible: string; }'. Did you mean 'Faible'?
+components/sst/IncidentTable.tsx(193,50): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"reported"' have no overlap.
+components/sst/IncidentTable.tsx(196,50): error TS2367: This comparison appears to be unintentional because the types 'IncidentStatus' and '"closed"' have no overlap.
+lib/business-logic/workflow-engine.ts(5,5): error TS2353: Object literal may only specify known properties, and 'new' does not exist in type 'Record<WorkOrderStatus, WorkOrderStatus[]>'.
+lib/business-logic/workflow-engine.ts(27,14): error TS2678: Type '"in_progress"' is not comparable to type 'WorkOrderStatus'.
+lib/business-logic/workflow-engine.ts(30,14): error TS2678: Type '"completed"' is not comparable to type 'WorkOrderStatus'.
+lib/business-logic/workflow-engine.ts(36,14): error TS2678: Type '"closed"' is not comparable to type 'WorkOrderStatus'.
+lib/business-logic/workflow-engine.ts(46,5): error TS2353: Object literal may only specify known properties, and 'new' does not exist in type 'Record<WorkOrderStatus, string>'.
+lib/business-logic/workflow-engine.ts(59,5): error TS2353: Object literal may only specify known properties, and 'new' does not exist in type 'Record<WorkOrderStatus, string>'.
