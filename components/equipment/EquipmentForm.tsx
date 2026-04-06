@@ -50,7 +50,7 @@ export function EquipmentForm({
             rate_per_week: initialData?.rate_per_week || undefined,
             rate_per_month: initialData?.rate_per_month || undefined,
             loan_conditions: initialData?.loan_conditions || "",
-            criticality: (initialData?.criticality as "FAIBLE" | "MOYENNE" | "ELEVEE") || "MOYENNE",
+            criticality: (initialData?.criticality as "Critique" | "Haute" | "Moyenne" | "Faible") || "Moyenne",
             tags: initialData?.tags || [],
             notes: initialData?.notes || "",
         },
@@ -87,7 +87,7 @@ export function EquipmentForm({
                 condition: values.condition || 'BON',
                 status: values.status || 'EN_SERVICE',
                 unit: values.unit || 'UNITE',
-                criticality: values.criticality || 'MOYENNE',
+                criticality: values.criticality || 'Moyenne',
 
                 // === UUID FK columns: null if empty, never "" ===
                 category_id: values.category_id && values.category_id !== '' ? values.category_id : null,
@@ -262,9 +262,10 @@ export function EquipmentForm({
 
                     <FieldWrapper label="Criticité" error={errors.criticality}>
                         <select {...register("criticality")} className={inputClass}>
-                            <option value="ELEVEE">Élevée</option>
-                            <option value="MOYENNE">Moyenne</option>
-                            <option value="FAIBLE">Faible</option>
+                            <option value="Critique">Critique</option>
+                            <option value="Haute">Haute</option>
+                            <option value="Moyenne">Moyenne</option>
+                            <option value="Faible">Faible</option>
                         </select>
                     </FieldWrapper>
                 </div>

@@ -28,7 +28,7 @@ export const equipmentSchema = z.object({
     rate_per_week: z.coerce.number().min(0).optional(),
     rate_per_month: z.coerce.number().min(0).optional(),
     loan_conditions: z.string().optional(),
-    criticality: z.enum(["FAIBLE", "MOYENNE", "ELEVEE"]).default("MOYENNE"),
+    criticality: z.enum(["Critique", "Haute", "Moyenne", "Faible"]).default("Moyenne"),
     tags: z.array(z.string()).optional().default([]),
     qr_code_url: z.string().optional(),
     notes: z.string().optional(),

@@ -16,4 +16,4 @@ export interface EquipmentWithJoins extends EquipmentRow {
 export type EquipmentStatus = 'EN_SERVICE' | 'EN_STOCK' | 'RESERVE' | 'EN_MAINTENANCE' | 'PRETE' | 'HORS_SERVICE' | 'MIS_AU_REBUT' | 'A_VALIDER';
 export type EquipmentCondition = 'NEUF' | 'TRES_BON' | 'BON' | 'MOYEN' | 'MAUVAIS' | 'HORS_SERVICE';
 export type EquipmentUnit = 'UNITE' | 'KIT' | 'ENSEMBLE' | 'LOT' | 'POSTE';
-export type EquipmentCriticality = 'FAIBLE' | 'MOYENNE' | 'ELEVEE';
+export type EquipmentCriticality = 'Critique' | 'Haute' | 'Moyenne' | 'Faible';
