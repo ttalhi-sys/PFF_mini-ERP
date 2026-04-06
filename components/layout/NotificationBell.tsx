@@ -31,7 +31,7 @@ export function NotificationBell({ userId }: { userId: string }) {
             const { data, error } = await supabase
                 .from('notifications')
                 .select('*')
-                .eq('profile_id', userId)
+                .eq('user_id', userId)
                 .order('created_at', { ascending: false })
                 .limit(10)
 
@@ -60,7 +60,7 @@ export function NotificationBell({ userId }: { userId: string }) {
                     event: 'INSERT',
                     schema: 'public',
                     table: 'notifications',
-                    filter: `profile_id=eq.${userId}`
+                    filter: `user_id=eq.${userId}`
                 },
                 () => {
                     fetchNotifications()
