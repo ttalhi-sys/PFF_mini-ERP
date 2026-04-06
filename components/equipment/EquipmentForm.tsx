@@ -79,39 +79,42 @@ export function EquipmentForm({
             const payload = {
                 code: values.code,
                 name: values.name,
-                category_id: values.category_id || null,
-                manufacturer: values.manufacturer,
-                model: values.model,
-                serial_number: values.serial_number,
+                category_id: values.category_id && values.category_id !== '' ? values.category_id : null,
+                manufacturer: values.manufacturer || null,
+                model: values.model || null,
+                serial_number: values.serial_number || null,
                 quantity: values.quantity,
                 unit: values.unit,
-                location_id: values.location_id || null,
-                description: values.description,
-                specifications: specsJson,
+                location_id: values.location_id && values.location_id !== '' ? values.location_id : null,
+                description: values.description || null,
+                main_characteristics: specsJson,
                 condition: values.condition,
                 status: values.status,
                 acquisition_date: values.acquisition_date || null,
-                acquisition_cost: values.acquisition_cost,
-                estimated_value: values.estimated_value,
-                funding_source: values.funding_source,
-                owner: values.owner,
+                estimated_value: values.estimated_value || null,
+                purchase_source: values.funding_source || null,
+                owner: values.owner || null,
                 is_loanable: values.is_loanable,
-                rate_per_day: values.rate_per_day,
-                rate_per_week: values.rate_per_week,
-                rate_per_month: values.rate_per_month,
-                loan_conditions: values.loan_conditions,
-                criticality: values.criticality,
-                tags: values.tags,
-                notes: values.notes,
+                daily_rate: values.rate_per_day || null,
+                weekly_rate: values.rate_per_week || null,
+                monthly_rate: values.rate_per_month || null,
+                loan_conditions: values.loan_conditions || null,
+                notes: values.notes || null,
             }
 
             if (isEditMode) {
                 const { error } = await supabase.from("equipment").update(payload).eq("id", initialData.id)
-                if (error) throw error
+                if (error) {
+                    console.error('UPDATE error:', error)
+                    throw error
+                }
                 router.push(`/equipment/${initialData.id}`)
             } else {
                 const { data, error } = await supabase.from("equipment").insert(payload).select("id").single()
-                if (error) throw error
+                if (error) {
+                    console.error('INSERT error:', error)
+                    throw error
+                }
                 router.push(`/equipment/${data.id}`)
             }
 
