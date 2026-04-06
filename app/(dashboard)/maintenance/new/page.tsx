@@ -12,21 +12,6 @@ export default async function NewWorkOrderPage({
 }) {
     const supabase = createClient();
 
-    // Fetch all equipment for the dropdown
-    const { data: equipmentList } = await supabase
-        .from('equipment')
-        .select('id, name, code')
-        .order('code', { ascending: true });
-
-    console.log('Equipment list:', equipmentList);
-
-    // Fetch technicians for the assignment dropdown
-    const { data: technicians } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('role', 'technician')
-        .eq('is_active', true);
-
     // Generate the new WO code asynchronously
     const generatedCode = await generateSequentialCode(supabase, 'WO', 'work_orders');
 
@@ -43,8 +28,6 @@ export default async function NewWorkOrderPage({
             </div>
 
             <WorkOrderForm
-                equipmentList={equipmentList || []}
-                technicians={technicians || []}
                 initialEquipmentId={searchParams.equipment}
                 generatedCode={generatedCode}
             />

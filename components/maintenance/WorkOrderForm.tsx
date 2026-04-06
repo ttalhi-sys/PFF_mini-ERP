@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -11,15 +11,11 @@ import { workOrderSchema, WorkOrderFormValues } from '@/lib/validators/work-orde
 import { createClient } from '@/lib/supabase/client';
 
 interface WorkOrderFormProps {
-    equipmentList: { id: string; name: string; code: string }[];
-    technicians: { id: string; full_name: string }[];
     initialEquipmentId?: string;
     generatedCode: string;
 }
 
 export default function WorkOrderForm({
-    equipmentList,
-    technicians,
     initialEquipmentId,
     generatedCode
 }: WorkOrderFormProps) {
@@ -28,7 +24,31 @@ export default function WorkOrderForm({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    console.log('Props received:', equipmentList);
+    const [equipmentList, setEquipmentList] = useState<{ id: string; name: string; code: string }[]>([]);
+    const [technicians, setTechnicians] = useState<{ id: string; full_name: string }[]>([]);
+
+    useEffect(() => {
+        const fetchFormData = async () => {
+            const { data: eqData, error: eqError } = await supabase
+                .from('equipment')
+                .select('id, name, code')
+                .order('code', { ascending: true });
+            
+            console.log('Client fetch equipment:', eqData, eqError);
+            if (eqData) setEquipmentList(eqData);
+
+            const { data: techData, error: techError } = await supabase
+                .from('profiles')
+                .select('id, full_name')
+                .eq('role', 'technician')
+                .eq('is_active', true);
+
+            console.log('Client fetch technicians:', techData, techError);
+            if (techData) setTechnicians(techData);
+        };
+
+        fetchFormData();
+    }, [supabase]);
 
     const {
         register,
