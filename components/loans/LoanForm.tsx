@@ -27,17 +27,31 @@ import { toast } from 'sonner';
 
 interface LoanFormProps {
     prefillCode: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    equipmentOptions: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    profileOptions: any[];
 }
 
-export function LoanForm({ prefillCode, equipmentOptions, profileOptions }: LoanFormProps) {
+export function LoanForm({ prefillCode }: LoanFormProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialEquipmentId = searchParams.get('equipment');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [equipmentOptions, setEquipmentOptions] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchEquipment = async () => {
+            const supabase = createClient();
+            const { data, error } = await supabase
+                .from('equipment')
+                .select('id, name, code, rate_per_day, rate_per_week, rate_per_month')
+                .eq('is_loanable', true)
+                .order('code', { ascending: true });
+            
+            console.log('Client fetch equipment:', data, error);
+            if (data) setEquipmentOptions(data);
+        };
+        fetchEquipment();
+    }, []);
 
     const initialItem = {
         equipment_id: initialEquipmentId || '',
@@ -279,21 +293,9 @@ export function LoanForm({ prefillCode, equipmentOptions, profileOptions }: Loan
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Responsable interne (Garant)</FormLabel>
-                                            <Select onValueChange={field.onChange} value={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Sélectionnez un garant" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="">Aucun</SelectItem>
-                                                    {profileOptions.map(profile => (
-                                                        <SelectItem key={profile.id} value={profile.id}>
-                                                            {profile.full_name}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <FormControl>
+                                                <Input placeholder="Nom du responsable interne" {...field} />
+                                            </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}

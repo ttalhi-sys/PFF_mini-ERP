@@ -17,7 +17,7 @@ export const loanSchema = z.object({
     borrower_phone: z.string().optional(),
     borrower_type: z.enum(['internal', 'external']),
     borrower_org: z.string().optional(),
-    responsible_id: z.string().uuid().optional().or(z.literal('')),
+    responsible_id: z.string().optional(),
 
     checkout_date: z.string().min(1, { message: "La date de sortie est requise" }),
     expected_return: z.string().min(1, { message: "La date de retour est requise" }),

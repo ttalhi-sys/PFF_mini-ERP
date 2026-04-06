@@ -13,19 +13,9 @@ export const metadata = {
 export default async function NewLoanPage() {
     const supabase = createClient();
 
-    // 1. Fetch available equipment options
-    const { data: equipmentOptions } = await supabase
-        .from('equipment')
-        .select('*')
-        .eq('status', 'available')
-        .eq('is_loanable', true)
-        .order('name');
+    // 1. Equipments are fetched on the client side
 
-    // 2. Fetch internal responsible profiles for guaranteeing external loans
-    const { data: profileOptions } = await supabase
-        .from('profiles')
-        .select('id, full_name, role')
-        .order('full_name');
+    // 2. Profile Options are no longer needed as responsible_id is a free text input
 
     // 3. Generate sequential loan code format EMP-YYYY-001
     const nextCode = await generateSequentialCode(supabase, 'EMP', 'loans', 'code');
@@ -45,8 +35,6 @@ export default async function NewLoanPage() {
             <Suspense fallback={<div className="h-64 flex items-center justify-center text-slate-500">Chargement...</div>}>
                 <LoanForm
                     prefillCode={nextCode}
-                    equipmentOptions={equipmentOptions || []}
-                    profileOptions={profileOptions || []}
                 />
             </Suspense>
         </div>
