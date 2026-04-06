@@ -16,8 +16,7 @@ export default async function NewWorkOrderPage({
     const { data: equipmentList } = await supabase
         .from('equipment')
         .select('id, name, code')
-        .eq('status', 'available') // Could be any status really, but keeping it simple
-        .order('name');
+        .order('code', { ascending: true });
 
     // Fetch technicians for the assignment dropdown
     const { data: technicians } = await supabase
