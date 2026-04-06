@@ -72,13 +72,13 @@ export function LoanDetail({ loan }: LoanDetailProps) {
 
             if (loanErr) throw loanErr;
 
-            // Mark all items as 'loaned' in equipment table
+            // Mark all items as 'PRETE' (loaned) in equipment table
             if (loan.loan_items) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
                 const { error: eqpErr } = await supabase
                     .from('equipment')
-                    .update({ status: 'loaned' })
+                    .update({ status: 'PRETE' })
                     .in('id', equipmentIds);
 
                 if (eqpErr) throw eqpErr;

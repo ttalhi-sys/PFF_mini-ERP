@@ -58,8 +58,7 @@ export default async function DocumentsPage({
                 <DocumentUploadModal userId={user?.id || ''} entities={formattedEntities} />
             </div>
 
-            {/* TODO: Implémenter le filtrage client-side ou la mise à jour des paramètres d'URL */}
-            {/* <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4">
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                     <Input placeholder="Rechercher par nom de fichier..." className="pl-9 bg-slate-50" />
@@ -76,7 +75,7 @@ export default async function DocumentsPage({
                         </select>
                     </div>
                 </div>
-            </div> */}
+            </div>
 
             <DocumentGrid documents={documents as any || []} />
         </div>

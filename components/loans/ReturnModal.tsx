@@ -87,7 +87,7 @@ export function ReturnModal({ isOpen, onClose, loan }: ReturnModalProps) {
                 const { error: eqpErr } = await supabase
                     .from('equipment')
                     .update({
-                        status: 'available',
+                        status: 'EN_SERVICE',
                         condition: condition // Reflect the reality back to the inventory
                     })
                     .eq('id', item.equipment_id);

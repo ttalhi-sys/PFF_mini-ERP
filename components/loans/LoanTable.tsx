@@ -129,8 +129,7 @@ export function LoanTable({ loans }: LoanTableProps) {
                                                     <FileText className="mr-2 h-4 w-4" />
                                                     Voir les détails
                                                 </DropdownMenuItem>
-                                                {/* TODO: Implémenter les actions rapides du tableau */}
-                                                {/* {(displayStatus === 'active' || displayStatus === 'overdue') && (
+                                                {(displayStatus === 'active' || displayStatus === 'overdue') && (
                                                     <DropdownMenuItem onClick={() => router.push(`/loans/${loan.id}?action=return`)}>
                                                         <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                                                         Enregistrer retour
@@ -143,11 +142,11 @@ export function LoanTable({ loans }: LoanTableProps) {
                                                     </DropdownMenuItem>
                                                 )}
                                                 {displayStatus === 'reserved' && (
-                                                    <DropdownMenuItem className="text-red-600" onClick={() => console.log('Cancel loan')}>
+                                                    <DropdownMenuItem className="text-red-600" onClick={() => router.push(`/loans/${loan.id}`)}>
                                                         <XCircle className="mr-2 h-4 w-4" />
                                                         Annuler
                                                     </DropdownMenuItem>
-                                                )} */}
+                                                )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

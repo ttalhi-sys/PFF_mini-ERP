@@ -72,7 +72,7 @@ export function TicketForm({ equipmentList, userId, preselectedEquipmentId }: Ti
                     priority: data.priority,
                     equipment_id: data.equipment_id || null,
                     submitted_by: userId,
-                    status: 'Ouvert'
+                    status: 'OUVERT'
                 })
 
             if (error) throw error

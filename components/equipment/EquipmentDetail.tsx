@@ -271,10 +271,9 @@ export default function EquipmentDetail({
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-end">
-                    {/* TODO: Implémenter l'upload de documents */}
-                    {/* <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
+                    <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">
                         + Ajouter un document
-                    </button> */}
+                    </button>
                 </div>
                 <DataTable columns={cols} data={documents} totalCount={documents.length} pageSize={10} currentPage={1} emptyMessage="Aucun document rattaché." />
             </div>

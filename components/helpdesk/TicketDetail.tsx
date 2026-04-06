@@ -10,6 +10,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import Link from "next/link"
+import { generateSequentialCode } from "@/lib/business-logic/code-generator"
 
 interface TicketDetailProps {
     ticket: HelpdeskTicket
@@ -52,6 +53,78 @@ export function TicketDetail({ ticket }: TicketDetailProps) {
         } catch (error) {
             console.error('Error updating status:', error)
             toast.error("Erreur lors de la mise à jour du statut")
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    const handleConvertToWO = async () => {
+        try {
+            setIsUpdating(true)
+            const code = await generateSequentialCode(supabase, 'WO', 'work_orders', 'code')
+            const { data: woData, error: woError } = await supabase
+                .from('work_orders')
+                .insert({
+                    code,
+                    title: `[Ticket ${ticket.code}] ${ticket.title}`,
+                    description: ticket.description,
+                    equipment_id: ticket.equipment_id || null,
+                    type: 'CORRECTIF',
+                    priority: ticket.priority === 'Critique' || ticket.priority === 'Haute' ? 'ELEVEE' : ticket.priority === 'Moyenne' ? 'MOYENNE' : 'FAIBLE',
+                    status: 'NOUVEAU',
+                    created_by: ticket.submitted_by,
+                })
+                .select('id')
+                .single()
+            if (woError) throw woError
+
+            // Link ticket to the created WO
+            await supabase
+                .from('helpdesk_tickets')
+                .update({ converted_to_type: 'work_order', converted_to_id: woData.id })
+                .eq('id', ticket.id)
+
+            toast.success('Ordre de travail créé avec succès')
+            router.push(`/maintenance/${woData.id}`)
+        } catch (error) {
+            console.error('Error converting to WO:', error)
+            toast.error("Erreur lors de la conversion en OT")
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
+    const handleConvertToIncident = async () => {
+        try {
+            setIsUpdating(true)
+            const code = await generateSequentialCode(supabase, 'INC', 'sst_incidents', 'code')
+            const { data: incData, error: incError } = await supabase
+                .from('sst_incidents')
+                .insert({
+                    code,
+                    description: `[Ticket ${ticket.code}] ${ticket.title}\n\n${ticket.description}`,
+                    equipment_id: ticket.equipment_id || null,
+                    incident_type: 'INCIDENT',
+                    severity: ticket.priority === 'Critique' || ticket.priority === 'Haute' ? 'ELEVEE' : ticket.priority === 'Moyenne' ? 'MOYENNE' : 'FAIBLE',
+                    status: 'SIGNALE',
+                    incident_date: new Date().toISOString(),
+                    created_by: ticket.submitted_by,
+                })
+                .select('id')
+                .single()
+            if (incError) throw incError
+
+            // Link ticket to the created incident
+            await supabase
+                .from('helpdesk_tickets')
+                .update({ converted_to_type: 'sst_incident', converted_to_id: incData.id })
+                .eq('id', ticket.id)
+
+            toast.success('Incident SST créé avec succès')
+            router.push(`/sst/incidents/${incData.id}`)
+        } catch (error) {
+            console.error('Error converting to incident:', error)
+            toast.error("Erreur lors de la conversion en incident")
         } finally {
             setIsUpdating(false)
         }
@@ -265,11 +338,11 @@ export function TicketDetail({ ticket }: TicketDetailProps) {
                         {(ticket.status !== 'CLOTURE') && (
                             <div className="space-y-2 pt-2">
                                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Conversions</p>
-                                {/* TODO: Implémenter la logique de conversion des tickets */}
-                                {/* <Button
+                                <Button
                                     variant="outline"
                                     className="w-full shadow-sm text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 justify-start"
                                     disabled={isUpdating || !!ticket.converted_to_id}
+                                    onClick={handleConvertToWO}
                                 >
                                     <Hammer className="mr-2 h-4 w-4" />
                                     Convertir en OT
@@ -278,10 +351,11 @@ export function TicketDetail({ ticket }: TicketDetailProps) {
                                     variant="outline"
                                     className="w-full shadow-sm text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 justify-start"
                                     disabled={isUpdating || !!ticket.converted_to_id}
+                                    onClick={handleConvertToIncident}
                                 >
                                     <AlertCircle className="mr-2 h-4 w-4" />
                                     Convertir en Incident
-                                </Button> */}
+                                </Button>
                                 {ticket.converted_to_id && (
                                     <p className="text-xs text-orange-600 mt-2 italic text-center leading-tight">
                                         Ce ticket a déjà été converti.

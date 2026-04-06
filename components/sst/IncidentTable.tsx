@@ -117,11 +117,10 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                         <option value="RESOLU">Résolu</option>
                         <option value="CLOTURE">Clôturé</option>
                     </select>
-                    {/* TODO: Implémenter le panneau des filtres avancés */}
-                    {/* <Button variant="outline" className="shrink-0">
+                    <Button variant="outline" className="shrink-0">
                         <Filter className="w-4 h-4 mr-2" />
                         Filtres
-                    </Button> */}
+                    </Button>
                 </div>
             </div>
 
@@ -191,13 +190,16 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                                                 <Link href={`/sst/incidents/${incident.id}`} className="w-full">
                                                     <DropdownMenuItem>Voir les détails</DropdownMenuItem>
                                                 </Link>
-                                                {/* TODO: Implémenter les actions rapides d'investigation/résolution dans le tableau */}
-                                                {/* {incident.status === 'SIGNALE' && (
-                                                    <DropdownMenuItem>Lancer investigation</DropdownMenuItem>
+                                                {incident.status === 'SIGNALE' && (
+                                                    <Link href={`/sst/incidents/${incident.id}`} className="w-full">
+                                                        <DropdownMenuItem>Lancer investigation</DropdownMenuItem>
+                                                    </Link>
                                                 )}
                                                 {incident.status !== 'CLOTURE' && (
-                                                    <DropdownMenuItem className="text-green-600">Marquer résolu</DropdownMenuItem>
-                                                )} */}
+                                                    <Link href={`/sst/incidents/${incident.id}`} className="w-full">
+                                                        <DropdownMenuItem className="text-green-600">Marquer résolu</DropdownMenuItem>
+                                                    </Link>
+                                                )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

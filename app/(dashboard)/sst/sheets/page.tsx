@@ -53,8 +53,7 @@ export default async function SSTSheetsPage() {
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    {/* TODO: Implémenter le filtrage et la création de fiches SST */}
-                    {/* <select className="h-10 border border-gray-200 rounded-md px-3 text-sm flex-grow sm:flex-grow-0 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select className="h-10 border border-gray-200 rounded-md px-3 text-sm flex-grow sm:flex-grow-0 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option>Toutes les catégories</option>
                         <option>Mécanique/Pneumatique</option>
                         <option>Ergonomique</option>
@@ -65,7 +64,7 @@ export default async function SSTSheetsPage() {
                     <Button className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap">
                         <Plus className="w-4 h-4 mr-2" />
                         Nouvelle fiche
-                    </Button> */}
+                    </Button>
                 </div>
             </div>
 

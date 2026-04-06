@@ -59,7 +59,7 @@ export default function WorkOrderForm({
             const payload = {
                 ...data,
                 code: generatedCode,
-                status: 'new', // Default status for new WOs
+                status: 'NOUVEAU', // Default status for new WOs
                 created_by: session?.user.id || null,
                 priority: data.priority || 'MOYENNE',
                 // Convert optional numeric fields, set to null if empty string
