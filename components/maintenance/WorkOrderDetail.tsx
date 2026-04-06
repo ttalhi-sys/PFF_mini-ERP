@@ -336,9 +336,10 @@ export default function WorkOrderDetail({ workOrder }: WorkOrderDetailProps) {
                                 <FileText className="w-4 h-4 mr-2 text-gray-500" />
                                 Documents liés
                             </CardTitle>
-                            <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center font-medium">
+                            {/* TODO: Implémenter l'upload de documents */}
+                            {/* <button className="text-xs text-blue-600 hover:text-blue-800 flex items-center font-medium">
                                 <Upload className="w-3 h-3 mr-1" /> Ajouter
-                            </button>
+                            </button> */}
                         </CardHeader>
                         <CardContent className="pt-4">
                             <div className="text-center py-6 text-gray-500">

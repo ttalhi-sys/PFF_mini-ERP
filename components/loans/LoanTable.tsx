@@ -129,7 +129,8 @@ export function LoanTable({ loans }: LoanTableProps) {
                                                     <FileText className="mr-2 h-4 w-4" />
                                                     Voir les détails
                                                 </DropdownMenuItem>
-                                                {(displayStatus === 'active' || displayStatus === 'overdue') && (
+                                                {/* TODO: Implémenter les actions rapides du tableau */}
+                                                {/* {(displayStatus === 'active' || displayStatus === 'overdue') && (
                                                     <DropdownMenuItem onClick={() => router.push(`/loans/${loan.id}?action=return`)}>
                                                         <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                                                         Enregistrer retour
@@ -146,7 +147,7 @@ export function LoanTable({ loans }: LoanTableProps) {
                                                         <XCircle className="mr-2 h-4 w-4" />
                                                         Annuler
                                                     </DropdownMenuItem>
-                                                )}
+                                                )} */}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

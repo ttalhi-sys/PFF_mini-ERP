@@ -265,7 +265,8 @@ export function TicketDetail({ ticket }: TicketDetailProps) {
                         {(ticket.status !== 'CLOTURE') && (
                             <div className="space-y-2 pt-2">
                                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Conversions</p>
-                                <Button
+                                {/* TODO: Implémenter la logique de conversion des tickets */}
+                                {/* <Button
                                     variant="outline"
                                     className="w-full shadow-sm text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 justify-start"
                                     disabled={isUpdating || !!ticket.converted_to_id}
@@ -280,7 +281,7 @@ export function TicketDetail({ ticket }: TicketDetailProps) {
                                 >
                                     <AlertCircle className="mr-2 h-4 w-4" />
                                     Convertir en Incident
-                                </Button>
+                                </Button> */}
                                 {ticket.converted_to_id && (
                                     <p className="text-xs text-orange-600 mt-2 italic text-center leading-tight">
                                         Ce ticket a déjà été converti.

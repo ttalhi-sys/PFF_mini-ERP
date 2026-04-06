@@ -48,14 +48,14 @@ export default function WorkOrderTable({ data }: WorkOrderTableProps) {
                 </div>
 
                 <div className="flex gap-2">
-                    {/* Dropdown placeholders for filters - actual implementation would use Select component */}
-                    <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-gray-50 hover:bg-gray-100">
+                    {/* TODO: Implémenter les filtres avancés */}
+                    {/* <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-gray-50 hover:bg-gray-100">
                         <Filter className="h-4 w-4" />
                         Tous les statuts
                     </button>
                     <button className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 bg-gray-50 hover:bg-gray-100">
                         Toutes les priorités
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
@@ -147,10 +147,11 @@ export default function WorkOrderTable({ data }: WorkOrderTableProps) {
                                                     <Link href={`/maintenance/${wo.id}`} className="w-full">
                                                         <DropdownMenuItem>Voir les détails</DropdownMenuItem>
                                                     </Link>
-                                                    <DropdownMenuItem>Modifier l&apos;ordre</DropdownMenuItem>
+                                                    {/* TODO: Implémenter la modification et l'action rapide */}
+                                                    {/* <DropdownMenuItem>Modifier l'ordre</DropdownMenuItem>
                                                     {wo.status === 'EN_COURS' && (
                                                         <DropdownMenuItem className="text-green-600 font-medium">Marquer terminé</DropdownMenuItem>
-                                                    )}
+                                                    )} */}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </td>

@@ -117,10 +117,11 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                         <option value="RESOLU">Résolu</option>
                         <option value="CLOTURE">Clôturé</option>
                     </select>
-                    <Button variant="outline" className="shrink-0">
+                    {/* TODO: Implémenter le panneau des filtres avancés */}
+                    {/* <Button variant="outline" className="shrink-0">
                         <Filter className="w-4 h-4 mr-2" />
                         Filtres
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 
@@ -190,12 +191,13 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
                                                 <Link href={`/sst/incidents/${incident.id}`} className="w-full">
                                                     <DropdownMenuItem>Voir les détails</DropdownMenuItem>
                                                 </Link>
-                                                {incident.status === 'SIGNALE' && (
+                                                {/* TODO: Implémenter les actions rapides d'investigation/résolution dans le tableau */}
+                                                {/* {incident.status === 'SIGNALE' && (
                                                     <DropdownMenuItem>Lancer investigation</DropdownMenuItem>
                                                 )}
                                                 {incident.status !== 'CLOTURE' && (
                                                     <DropdownMenuItem className="text-green-600">Marquer résolu</DropdownMenuItem>
-                                                )}
+                                                )} */}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
