@@ -76,34 +76,55 @@ export function EquipmentForm({
                 }
             }
 
+            // Build payload matching database.ts equipment.Insert exactly
+            // Fields with CHECK constraints MUST always have a valid value, never null
             const payload = {
+                // === REQUIRED (NOT NULL in DB) ===
                 code: values.code,
                 name: values.name,
+
+                // === CHECK-constrained fields: always send a valid value ===
+                condition: values.condition || 'BON',
+                status: values.status || 'EN_SERVICE',
+                unit: values.unit || 'UNITE',
+                criticality: values.criticality || 'MOYENNE',
+
+                // === UUID FK columns: null if empty, never "" ===
                 category_id: values.category_id && values.category_id !== '' ? values.category_id : null,
+                location_id: values.location_id && values.location_id !== '' ? values.location_id : null,
+
+                // === Nullable strings: null if empty ===
                 manufacturer: values.manufacturer || null,
                 model: values.model || null,
                 serial_number: values.serial_number || null,
-                quantity: values.quantity,
-                unit: values.unit,
-                location_id: values.location_id && values.location_id !== '' ? values.location_id : null,
                 description: values.description || null,
-                specifications: specsJson,
-                condition: values.condition,
-                status: values.status,
-                acquisition_date: values.acquisition_date || null,
+                owner: values.owner || null,
+                funding_source: values.funding_source || null,
+                loan_conditions: values.loan_conditions || null,
+                notes: values.notes || null,
+
+                // === Nullable numbers: null if empty/0 ===
+                quantity: values.quantity || 1,
                 acquisition_cost: values.acquisition_cost || null,
                 estimated_value: values.estimated_value || null,
-                funding_source: values.funding_source || null,
-                owner: values.owner || null,
-                is_loanable: values.is_loanable,
                 rate_per_day: values.rate_per_day || null,
                 rate_per_week: values.rate_per_week || null,
                 rate_per_month: values.rate_per_month || null,
-                loan_conditions: values.loan_conditions || null,
-                notes: values.notes || null,
-                ...(values.criticality ? { criticality: values.criticality } : {}),
-                ...(values.tags && values.tags.length > 0 ? { tags: values.tags } : {}),
+
+                // === Nullable date: null if empty ===
+                acquisition_date: values.acquisition_date || null,
+
+                // === Boolean ===
+                is_loanable: values.is_loanable ?? false,
+
+                // === JSONB: null if empty ===
+                specifications: specsJson,
+
+                // === Array: null if empty ===
+                tags: values.tags && values.tags.length > 0 ? values.tags : null,
             }
+
+            console.log('PAYLOAD:', JSON.stringify(payload, null, 2))
 
             if (isEditMode) {
                 const { error } = await supabase.from("equipment").update(payload).eq("id", initialData.id)
