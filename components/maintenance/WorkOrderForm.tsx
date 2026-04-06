@@ -28,6 +28,8 @@ export default function WorkOrderForm({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    console.log('Props received:', equipmentList);
+
     const {
         register,
         handleSubmit,

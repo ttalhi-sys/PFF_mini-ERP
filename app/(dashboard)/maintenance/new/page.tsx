@@ -18,6 +18,8 @@ export default async function NewWorkOrderPage({
         .select('id, name, code')
         .order('code', { ascending: true });
 
+    console.log('Equipment list:', equipmentList);
+
     // Fetch technicians for the assignment dropdown
     const { data: technicians } = await supabase
         .from('profiles')
