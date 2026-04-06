@@ -20,10 +20,78 @@ import {
 import {
     Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter
 } from '@/components/ui/card';
-import { Plus, Trash2, CalendarIcon, X } from 'lucide-react';
+import { Plus, Trash2, CalendarIcon, X, Check, ChevronsUpDown } from 'lucide-react';
 import { format, differenceInDays, parseISO, isValid } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+function EquipmentCombobox({ value, onChange, options, disabled = false }: {
+    value: string;
+    onChange: (val: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: any[];
+    disabled?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <FormControl>
+                <PopoverTrigger
+                    role="combobox"
+                    aria-expanded={open}
+                    disabled={disabled}
+                    className={cn(
+                        /* buttonVariants styles inline since we can't easily import buttonVariants without changing imports up top, wait, we can just import buttonVariants! Oh wait I forgot to import buttonVariants. Actually let's use the explicit classes from button.tsx: */
+                        "inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                        "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground h-8 px-2.5",
+                        "w-full justify-between bg-white font-normal",
+                        !value && "text-muted-foreground"
+                    )}
+                >
+                    <span className="truncate">
+                        {value
+                            ? (() => {
+                                const eq = options.find((e) => e.id === value);
+                                return eq ? `${eq.code} - ${eq.name}` : "Sélection...";
+                            })()
+                            : "Sélectionnez un équipement disponible"}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </PopoverTrigger>
+            </FormControl>
+            <PopoverContent className="w-[300px] md:w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Rechercher par code ou nom..." />
+                    <CommandList>
+                        <CommandEmpty>Aucun équipement trouvé.</CommandEmpty>
+                        <CommandGroup>
+                            {options.map((eq) => (
+                                <CommandItem
+                                    key={eq.id}
+                                    value={`${eq.code} ${eq.name}`}
+                                    onSelect={() => {
+                                        onChange(eq.id);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 flex-shrink-0 h-4 w-4",
+                                            eq.id === value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {eq.code} - {eq.name}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
+}
 
 interface LoanFormProps {
     prefillCode: string;
@@ -336,20 +404,11 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-xs font-semibold">Équipement</FormLabel>
-                                                        <Select onValueChange={field.onChange} value={field.value}>
-                                                            <FormControl>
-                                                                <SelectTrigger className="bg-white">
-                                                                    <SelectValue placeholder="Sélectionnez un équipement disponible" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {equipmentOptions.map(eq => (
-                                                                    <SelectItem key={eq.id} value={eq.id}>
-                                                                        {eq.code} - {eq.name}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
+                                                        <EquipmentCombobox
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            options={equipmentOptions}
+                                                        />
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
