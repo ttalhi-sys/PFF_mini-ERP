@@ -100,9 +100,9 @@ export function EquipmentForm({
                 rate_per_week: values.rate_per_week || null,
                 rate_per_month: values.rate_per_month || null,
                 loan_conditions: values.loan_conditions || null,
-                criticality: values.criticality || null,
-                tags: values.tags || [],
                 notes: values.notes || null,
+                ...(values.criticality ? { criticality: values.criticality } : {}),
+                ...(values.tags && values.tags.length > 0 ? { tags: values.tags } : {}),
             }
 
             if (isEditMode) {
