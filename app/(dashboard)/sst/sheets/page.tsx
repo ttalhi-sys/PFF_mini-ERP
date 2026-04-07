@@ -61,10 +61,12 @@ export default async function SSTSheetsPage() {
                         <option>Électrique faible</option>
                     </select>
 
-                    <Button className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nouvelle fiche
-                    </Button>
+                    <Link href="/sst/sheets/new">
+                        <Button className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nouvelle fiche
+                        </Button>
+                    </Link>
                 </div>
             </div>
 

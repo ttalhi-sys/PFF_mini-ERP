@@ -52,9 +52,11 @@ export function SSTSheetDetail({ sheet }: SSTSheetDetailProps) {
             </div>
 
             <div className="flex gap-2 justify-end mb-4">
-                <Button variant="outline">
-                    Modifier la fiche
-                </Button>
+                <Link href={`/sst/sheets/${sheet.id}/edit`}>
+                    <Button variant="outline">
+                        Modifier la fiche
+                    </Button>
+                </Link>
                 <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50">
                     <Printer className="w-4 h-4 mr-2" />
                     Imprimer

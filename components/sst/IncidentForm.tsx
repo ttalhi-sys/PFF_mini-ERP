@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils"
 
 interface IncidentFormProps {
     equipments: EquipmentRow[]
-    onSubmit: (data: IncidentFormValues) => Promise<void>
+    onSubmit: (data: IncidentFormValues, files: File[]) => Promise<void>
     onCancel: () => void
     isSubmitting?: boolean
 }
@@ -108,6 +108,8 @@ function EquipmentCombobox({ value, onChange, options, disabled = false }: {
 }
 
 export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = false }: IncidentFormProps) {
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+
     const defaultDate = new Date()
     defaultDate.setMinutes(defaultDate.getMinutes() - defaultDate.getTimezoneOffset())
     const defaultDateString = defaultDate.toISOString().slice(0, 16)
@@ -125,9 +127,13 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
         },
     })
 
+    const handleFormSubmit = (data: IncidentFormValues) => {
+        return onSubmit(data, selectedFiles)
+    }
+
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-4xl">
+            <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8 max-w-4xl">
 
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
@@ -284,13 +290,36 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                 <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-900 mb-4">3. Preuves et fichiers joints</h3>
 
-                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-10 flex flex-col items-center justify-center text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 flex flex-col items-center justify-center text-center bg-gray-50 hover:bg-gray-100 transition-colors relative">
+                        <input 
+                            type="file" 
+                            multiple 
+                            onChange={(e) => {
+                                if (e.target.files) {
+                                    setSelectedFiles(Array.from(e.target.files))
+                                }
+                            }}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            accept="image/*,application/pdf"
+                        />
                         <UploadCloud className="w-10 h-10 text-gray-400 mb-3" />
                         <p className="text-sm font-medium text-gray-700">Cliquez ou glissez des fichiers ici</p>
-                        <p className="text-xs text-gray-500 mt-1">Photos, rapports de police, témoignages (JPG, PNG, PDF)</p>
-                        <div className="mt-4 text-xs italic text-gray-400">
-                            (Fonctionnalité d'upload en attente d'intégration bucket)
-                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Photos, rapports, témoignages (JPG, PNG, PDF)</p>
+                        
+                        {selectedFiles.length > 0 && (
+                            <div className="mt-4 w-full flex flex-col items-center gap-2">
+                                <span className="text-sm font-semibold text-blue-600 block">
+                                    {selectedFiles.length} fichier(s) sélectionné(s) :
+                                </span>
+                                <ul className="text-xs text-gray-600 text-left w-full max-w-sm space-y-1">
+                                    {selectedFiles.map((f, i) => (
+                                        <li key={i} className="bg-white px-2 py-1 border rounded shadow-sm flex items-center justify-between">
+                                            <span className="truncate">{f.name}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
 
