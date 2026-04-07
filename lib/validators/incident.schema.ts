@@ -2,8 +2,8 @@ import * as z from "zod";
 
 export const incidentFormSchema = z.object({
     equipment_id: z.string().uuid("Identifiant d'équipement invalide").optional().or(z.literal('')),
-    incident_type: z.enum(['INCIDENT', 'QUASI_INCIDENT', 'OBSERVATION']),
-    severity: z.enum(['ELEVEE', 'MOYENNE', 'FAIBLE']),
+    incident_type: z.enum(['incident', 'near_miss', 'observation']),
+    severity: z.enum(['Critique', 'Élevée', 'Moyenne', 'Faible']),
     incident_date: z.string(), // we'll use string format for the form datetime-local value
     location: z.string().optional(),
     description: z.string().min(10, {

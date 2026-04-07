@@ -118,8 +118,8 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
         resolver: zodResolver(incidentFormSchema),
         defaultValues: {
             equipment_id: "",
-            incident_type: "INCIDENT",
-            severity: "MOYENNE",
+            incident_type: "incident",
+            severity: "Moyenne",
             incident_date: defaultDateString,
             location: "",
             description: "",
@@ -155,9 +155,9 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
-                                            <SelectItem value="INCIDENT">Incident</SelectItem>
-                                            <SelectItem value="QUASI_INCIDENT">Quasi-incident (Near Miss)</SelectItem>
-                                            <SelectItem value="OBSERVATION">Observation / Danger</SelectItem>
+                                            <SelectItem value="incident">Incident</SelectItem>
+                                            <SelectItem value="near_miss">Quasi-incident (Near Miss)</SelectItem>
+                                            <SelectItem value="observation">Observation / Danger</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -178,13 +178,16 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
-                                            <SelectItem value="ELEVEE">
+                                            <SelectItem value="Critique">
+                                                <div className="flex items-center"><div className="w-2 h-2 rounded-full bg-red-600 mr-2" /> Critique</div>
+                                            </SelectItem>
+                                            <SelectItem value="Élevée">
                                                 <div className="flex items-center"><div className="w-2 h-2 rounded-full bg-orange-500 mr-2" /> Élevée</div>
                                             </SelectItem>
-                                            <SelectItem value="MOYENNE">
+                                            <SelectItem value="Moyenne">
                                                 <div className="flex items-center"><div className="w-2 h-2 rounded-full bg-yellow-500 mr-2" /> Moyenne</div>
                                             </SelectItem>
-                                            <SelectItem value="FAIBLE">
+                                            <SelectItem value="Faible">
                                                 <div className="flex items-center"><div className="w-2 h-2 rounded-full bg-gray-500 mr-2" /> Faible</div>
                                             </SelectItem>
                                         </SelectContent>
