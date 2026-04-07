@@ -64,7 +64,7 @@ function EquipmentCombobox({ value, onChange, options, disabled = false }: {
             <PopoverContent className="w-[300px] md:w-[400px] p-0" align="start">
                 <Command>
                     <CommandInput placeholder="Rechercher par code ou nom..." />
-                    <CommandList>
+                    <CommandList className="bg-white max-h-[250px] overflow-y-auto">
                         <CommandEmpty>Aucun équipement trouvé.</CommandEmpty>
                         <CommandGroup>
                             {options.map((eq) => (
@@ -307,7 +307,7 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                                         <SelectValue placeholder="Sélectionnez le type" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent>
+                                                <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                     <SelectItem value="internal">Interne (LabGFHA)</SelectItem>
                                                     <SelectItem value="external">Externe (Autre département/Université)</SelectItem>
                                                 </SelectContent>
@@ -442,7 +442,7 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                                                     <SelectValue placeholder="État" />
                                                                 </SelectTrigger>
                                                             </FormControl>
-                                                            <SelectContent>
+                                                            <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                                 <SelectItem value="NEUF">Neuf</SelectItem>
                                                                 <SelectItem value="TRES_BON">Très bon</SelectItem>
                                                                 <SelectItem value="BON">Bon</SelectItem>

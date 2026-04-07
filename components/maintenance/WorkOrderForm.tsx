@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, ChevronsUpDown } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 import { workOrderSchema, WorkOrderFormValues } from '@/lib/validators/work-order.schema';
 import { createClient } from '@/lib/supabase/client';
@@ -13,6 +16,70 @@ import { createClient } from '@/lib/supabase/client';
 interface WorkOrderFormProps {
     initialEquipmentId?: string;
     generatedCode: string;
+}
+
+function EquipmentCombobox({ value, onChange, options, disabled = false }: {
+    value: string;
+    onChange: (val: string) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: any[];
+    disabled?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger
+                role="combobox"
+                aria-expanded={open}
+                disabled={disabled}
+                className={cn(
+                    "inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                    "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground h-10 px-3 py-2",
+                    "w-full justify-between bg-white font-normal",
+                    !value && "text-muted-foreground",
+                    disabled && "bg-gray-100"
+                )}
+            >
+                <span className="truncate">
+                    {value
+                        ? (() => {
+                            const eq = options.find((e) => e.id === value);
+                            return eq ? `${eq.name} (${eq.code})` : "Sélection...";
+                        })()
+                        : "Sélectionner un équipement"}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] md:w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Rechercher par code ou nom..." />
+                    <CommandList className="bg-white max-h-[250px] overflow-y-auto">
+                        <CommandEmpty>Aucun équipement trouvé.</CommandEmpty>
+                        <CommandGroup>
+                            {options.map((eq) => (
+                                <CommandItem
+                                    key={eq.id}
+                                    value={`${eq.code} ${eq.name}`}
+                                    onSelect={() => {
+                                        onChange(eq.id);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 flex-shrink-0 h-4 w-4",
+                                            eq.id === value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {eq.name} ({eq.code})
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
 }
 
 export default function WorkOrderForm({
@@ -54,6 +121,7 @@ export default function WorkOrderForm({
         register,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors },
     } = useForm<WorkOrderFormValues>({
         // @ts-expect-error: RHF deep partial typing with Zod
@@ -144,16 +212,11 @@ export default function WorkOrderForm({
                             <label htmlFor="equipment_id" className="text-sm font-medium text-gray-700 block">
                                 Équipement <span className="text-red-500">*</span>
                             </label>
-                            <select
-                                id="equipment_id"
-                                {...register('equipment_id')}
-                                className={`w-full px-3 py-2 border rounded-md text-sm ${errors.equipment_id ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`}
-                            >
-                                <option value="">Sélectionner un équipement</option>
-                                {equipmentList.map(eq => (
-                                    <option key={eq.id} value={eq.id}>{eq.name} ({eq.code})</option>
-                                ))}
-                            </select>
+                            <EquipmentCombobox
+                                value={watch('equipment_id')}
+                                onChange={(val) => setValue('equipment_id', val, { shouldValidate: true })}
+                                options={equipmentList}
+                            />
                             {errors.equipment_id && <p className="text-xs text-red-600">{errors.equipment_id.message}</p>}
                         </div>
 
@@ -178,7 +241,7 @@ export default function WorkOrderForm({
                             <select
                                 id="type"
                                 {...register('type')}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="PREVENTIF_SYSTEMATIQUE">Préventif (Systématique)</option>
                                 <option value="PREVENTIF_CONDITIONNEL">Préventif (Conditionnel)</option>
@@ -195,7 +258,7 @@ export default function WorkOrderForm({
                             <select
                                 id="priority"
                                 {...register('priority')}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="ELEVEE">Élevée</option>
                                 <option value="MOYENNE">Moyenne</option>
@@ -211,7 +274,7 @@ export default function WorkOrderForm({
                                 id="description"
                                 {...register('description')}
                                 rows={4}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Détaillez les étapes de l'intervention..."
                             />
                         </div>
@@ -223,7 +286,7 @@ export default function WorkOrderForm({
                             <select
                                 id="assigned_to"
                                 {...register('assigned_to')}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
                             >
                                 <option value="">Non assigné / À déterminer</option>
                                 {technicians.map(tech => (

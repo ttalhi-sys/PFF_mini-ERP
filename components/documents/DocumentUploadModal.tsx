@@ -224,7 +224,7 @@ export function DocumentUploadModal({ userId, entities = [] }: DocumentUploadMod
                                                     <SelectValue placeholder="Sélectionnez" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
+                                            <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                 {DOCUMENT_TYPES.map(type => (
                                                     <SelectItem key={type} value={type}>{type}</SelectItem>
                                                 ))}
@@ -250,7 +250,7 @@ export function DocumentUploadModal({ userId, entities = [] }: DocumentUploadMod
                                                     <SelectValue placeholder="Sélectionnez" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
+                                            <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                 {ENTITY_TYPES.map(type => (
                                                     <SelectItem key={type} value={type}>{type}</SelectItem>
                                                 ))}
@@ -275,7 +275,7 @@ export function DocumentUploadModal({ userId, entities = [] }: DocumentUploadMod
                                                     <SelectValue placeholder={`Sélectionnez un(e) ${currentEntityType.toLowerCase()}`} />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent>
+                                            <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                 {filteredEntities.length === 0 ? (
                                                     <SelectItem value="none" disabled>Aucune entité de ce type disponible</SelectItem>
                                                 ) : (

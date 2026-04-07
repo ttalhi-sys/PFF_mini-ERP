@@ -149,7 +149,7 @@ export function ReturnModal({ isOpen, onClose, loan }: ReturnModalProps) {
                                         <SelectTrigger>
                                             <SelectValue placeholder="Sélectionner l'état de retour" />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                             <SelectItem value="Neuf">Neuf</SelectItem>
                                             <SelectItem value="Bon">Bon</SelectItem>
                                             <SelectItem value="Passable">Passable</SelectItem>

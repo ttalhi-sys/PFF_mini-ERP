@@ -17,14 +17,94 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { EquipmentRow } from "@/lib/types/equipment"
-import { UploadCloud, AlertCircle } from "lucide-react"
+import { UploadCloud, AlertCircle, Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface IncidentFormProps {
     equipments: EquipmentRow[]
     onSubmit: (data: IncidentFormValues) => Promise<void>
     onCancel: () => void
     isSubmitting?: boolean
+}
+
+function EquipmentCombobox({ value, onChange, options, disabled = false }: {
+    value: string;
+    onChange: (val: string) => void;
+    options: EquipmentRow[];
+    disabled?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger
+                role="combobox"
+                aria-expanded={open}
+                disabled={disabled}
+                className={cn(
+                    "inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                    "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground h-10 px-3 py-2",
+                    "w-full justify-between bg-white font-normal",
+                    !value && "text-muted-foreground"
+                )}
+            >
+                <span className="truncate">
+                    {value
+                        ? (() => {
+                            const eq = options.find((e) => e.id === value);
+                            return eq ? `${eq.code} - ${eq.name}` : "Sélection...";
+                        })()
+                        : "Tous les équipements (Aucun)"}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] md:w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Rechercher par code ou nom..." />
+                    <CommandList className="bg-white max-h-[250px] overflow-y-auto">
+                        <CommandEmpty>Aucun équipement trouvé.</CommandEmpty>
+                        <CommandGroup>
+                            <CommandItem
+                                value="aucun"
+                                onSelect={() => {
+                                    onChange("");
+                                    setOpen(false);
+                                }}
+                            >
+                                <Check
+                                    className={cn(
+                                        "mr-2 flex-shrink-0 h-4 w-4",
+                                        !value ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                                Aucun équipement lié
+                            </CommandItem>
+                            {options.map((eq) => (
+                                <CommandItem
+                                    key={eq.id}
+                                    value={`${eq.code} ${eq.name}`}
+                                    onSelect={() => {
+                                        onChange(eq.id);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 flex-shrink-0 h-4 w-4",
+                                            eq.id === value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {eq.code} - {eq.name}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
 }
 
 export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = false }: IncidentFormProps) {
@@ -68,7 +148,7 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                                                 <SelectValue placeholder="Sélectionnez le type" />
                                             </SelectTrigger>
                                         </FormControl>
-                                        <SelectContent>
+                                        <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                             <SelectItem value="INCIDENT">Incident</SelectItem>
                                             <SelectItem value="QUASI_INCIDENT">Quasi-incident (Near Miss)</SelectItem>
                                             <SelectItem value="OBSERVATION">Observation / Danger</SelectItem>
@@ -91,7 +171,7 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                                                 <SelectValue placeholder="Sélectionnez la sévérité" />
                                             </SelectTrigger>
                                         </FormControl>
-                                        <SelectContent>
+                                        <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                             <SelectItem value="ELEVEE">
                                                 <div className="flex items-center"><div className="w-2 h-2 rounded-full bg-orange-500 mr-2" /> Élevée</div>
                                             </SelectItem>
@@ -129,24 +209,13 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                             render={({ field }: { field: any }) => (
                                 <FormItem>
                                     <FormLabel>Équipement impliqué (Optionnel)</FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        value={field.value}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Tous les équipements" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="">Aucun équipement lié</SelectItem>
-                                            {equipments.map(eq => (
-                                                <SelectItem key={eq.id} value={eq.id}>
-                                                    {eq.code} - {eq.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <FormControl>
+                                        <EquipmentCombobox
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            options={equipments}
+                                        />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}

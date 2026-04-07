@@ -29,13 +29,93 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, AlertCircle } from "lucide-react"
+import { Loader2, AlertCircle, Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface TicketFormProps {
     equipmentList: Pick<EquipmentRow, 'id' | 'name' | 'code'>[]
     userId: string
     preselectedEquipmentId?: string
+}
+
+function EquipmentCombobox({ value, onChange, options, disabled = false }: {
+    value: string;
+    onChange: (val: string) => void;
+    options: Pick<EquipmentRow, 'id' | 'name' | 'code'>[];
+    disabled?: boolean;
+}) {
+    const [open, setOpen] = useState(false);
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger
+                role="combobox"
+                aria-expanded={open}
+                disabled={disabled}
+                className={cn(
+                    "inline-flex shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
+                    "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground h-10 px-3 py-2",
+                    "w-full justify-between bg-white font-normal",
+                    !value && "text-muted-foreground"
+                )}
+            >
+                <span className="truncate">
+                    {value
+                        ? (() => {
+                            const eq = options.find((e) => e.id === value);
+                            return eq ? `${eq.code} - ${eq.name}` : "Sélection...";
+                        })()
+                        : "Sélectionnez un équipement s'il y a lieu"}
+                </span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </PopoverTrigger>
+            <PopoverContent className="w-[300px] md:w-[400px] p-0" align="start">
+                <Command>
+                    <CommandInput placeholder="Rechercher par code ou nom..." />
+                    <CommandList className="bg-white max-h-[250px] overflow-y-auto">
+                        <CommandEmpty>Aucun équipement trouvé.</CommandEmpty>
+                        <CommandGroup>
+                            <CommandItem
+                                value="none"
+                                onSelect={() => {
+                                    onChange("");
+                                    setOpen(false);
+                                }}
+                            >
+                                <Check
+                                    className={cn(
+                                        "mr-2 flex-shrink-0 h-4 w-4",
+                                        !value || value === "none" ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                                <span className="italic text-muted-foreground">Aucun équipement lié</span>
+                            </CommandItem>
+                            {options.map((eq) => (
+                                <CommandItem
+                                    key={eq.id}
+                                    value={`${eq.code} ${eq.name}`}
+                                    onSelect={() => {
+                                        onChange(eq.id);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 flex-shrink-0 h-4 w-4",
+                                            eq.id === value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {eq.code} - {eq.name}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
 }
 
 export function TicketForm({ equipmentList, userId, preselectedEquipmentId }: TicketFormProps) {
@@ -118,7 +198,7 @@ export function TicketForm({ equipmentList, userId, preselectedEquipmentId }: Ti
                                                         <SelectValue placeholder="Sélectionnez une catégorie" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent>
+                                                <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                     <SelectItem value="Problème d'équipement">Problème d'équipement</SelectItem>
                                                     <SelectItem value="Demande de maintenance">Demande de maintenance</SelectItem>
                                                     <SelectItem value="Problème de sécurité">Problème de sécurité</SelectItem>
@@ -143,7 +223,7 @@ export function TicketForm({ equipmentList, userId, preselectedEquipmentId }: Ti
                                                         <SelectValue placeholder="Sélectionnez une priorité" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent>
+                                                <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
                                                     <SelectItem value="Basse">Basse (Non urgent)</SelectItem>
                                                     <SelectItem value="Moyenne">Moyenne (Standard)</SelectItem>
                                                     <SelectItem value="Haute">Haute (Impact significatif)</SelectItem>
@@ -162,21 +242,13 @@ export function TicketForm({ equipmentList, userId, preselectedEquipmentId }: Ti
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Équipement concerné (Optionnel)</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Sélectionnez un équipement s'il y a lieu" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="none" className="text-muted-foreground italic">Aucun équipement lié</SelectItem>
-                                                {equipmentList.map(eq => (
-                                                    <SelectItem key={eq.id} value={eq.id}>
-                                                        {eq.code} - {eq.name}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                        <FormControl>
+                                            <EquipmentCombobox
+                                                value={field.value ?? ""}
+                                                onChange={field.onChange}
+                                                options={equipmentList}
+                                            />
+                                        </FormControl>
                                         <FormDescription>Si ce ticket concerne un équipement spécifique, veuillez le sélectionner.</FormDescription>
                                         <FormMessage />
                                     </FormItem>
