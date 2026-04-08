@@ -6,7 +6,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loanSchema } from '@/lib/validators/loan.schema';
 import { LoanFormValues } from '@/lib/types/loans';
-import { calculateLoanTotal } from '@/lib/business-logic/loan-billing';
+import { calculateLoanTotal, calculatePeriods, getRateForMode, BillingMode } from '@/lib/business-logic/loan-billing';
 
 import {
     Form, FormControl, FormField, FormItem, FormLabel, FormMessage
@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+
 function EquipmentCombobox({ value, onChange, options, disabled = false }: {
     value: string;
     onChange: (val: string) => void;
@@ -43,7 +44,6 @@ function EquipmentCombobox({ value, onChange, options, disabled = false }: {
                     aria-expanded={open}
                     disabled={disabled}
                     className={cn(
-                        /* buttonVariants styles inline since we can't easily import buttonVariants without changing imports up top, wait, we can just import buttonVariants! Oh wait I forgot to import buttonVariants. Actually let's use the explicit classes from button.tsx: */
                         "inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50",
                         "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground h-8 px-2.5",
                         "w-full justify-between bg-white font-normal",
@@ -93,6 +93,18 @@ function EquipmentCombobox({ value, onChange, options, disabled = false }: {
     );
 }
 
+const BILLING_MODE_LABELS: Record<BillingMode, string> = {
+    day: 'Par jour',
+    week: 'Par semaine',
+    month: 'Par mois'
+};
+
+const BILLING_PERIOD_LABELS: Record<BillingMode, string> = {
+    day: 'jour(s)',
+    week: 'semaine(s)',
+    month: 'mois'
+};
+
 interface LoanFormProps {
     prefillCode: string;
 }
@@ -102,6 +114,7 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
     const searchParams = useSearchParams();
     const initialEquipmentId = searchParams.get('equipment');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [billingMode, setBillingMode] = useState<BillingMode>('day');
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [equipmentOptions, setEquipmentOptions] = useState<any[]>([]);
@@ -190,16 +203,14 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                 const days = differenceInDays(end, start);
                 setDurationDays(Math.max(1, days)); // Minimum billable day = 1
 
-                // Calculate the true total based on rates
-
-                const sum = calculateLoanTotal(watchCheckout, watchExpected, watchItems);
+                const sum = calculateLoanTotal(watchCheckout, watchExpected, watchItems, billingMode);
                 setEstimatedTotal(sum);
             } else {
                 setDurationDays(0);
                 setEstimatedTotal(0);
             }
         }
-    }, [watchCheckout, watchExpected, watchItems]);
+    }, [watchCheckout, watchExpected, watchItems, billingMode]);
 
     // Because the form values are slightly mismatched with database types, accept unknown
     const onSubmit = async (data: unknown) => {
@@ -213,16 +224,22 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
             if (!session) throw new Error("Non autorisé");
 
             // Insert core loan record
+            // DB CHECK constraint: status IN ('reserved','active','overdue','returned','cancelled')
+            // responsible_id is a FK to profiles(id) — send null if empty string
+            const responsibleValue = validated.responsible_id && validated.responsible_id.trim() !== ''
+                ? validated.responsible_id
+                : null;
+
             const { data: loan, error: loanErr } = await supabase
                 .from('loans')
                 .insert({
-                    code: prefillCode, // Assigned from server
+                    code: prefillCode,
                     borrower_name: validated.borrower_name,
                     borrower_email: validated.borrower_email || null,
                     borrower_phone: validated.borrower_phone || null,
                     borrower_type: validated.borrower_type,
                     borrower_org: validated.borrower_org || null,
-                    responsible_id: validated.responsible_id || null,
+                    responsible_id: responsibleValue,
                     checkout_date: validated.checkout_date,
                     expected_return: validated.expected_return,
                     notes: validated.notes || null,
@@ -233,27 +250,34 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                 .select()
                 .single();
 
-            if (loanErr) throw loanErr;
+            if (loanErr) {
+                console.error("Loan insert error:", loanErr);
+                throw loanErr;
+            }
 
             // Insert loan items mapping
-            const itemsToInsert = validated.items.map(item => ({
-                loan_id: loan.id,
-                equipment_id: item.equipment_id,
-                quantity: item.quantity,
-                condition_before: item.condition_before,
-                subtotal: calculateLoanTotal(validated.checkout_date, validated.expected_return, [item]),
-                rate_type: durationDays <= 7 ? 'day' : (durationDays <= 30 ? 'week' : 'month'),
-                rate_applied: item.rate_per_day // Using base reference, real cost is in subtotal
-            }));
+            // DB CHECK constraint: rate_type IN ('day','week','month')
+            const itemsToInsert = validated.items.map(item => {
+                const rate = getRateForMode(item, billingMode);
+                return {
+                    loan_id: loan.id,
+                    equipment_id: item.equipment_id,
+                    quantity: item.quantity,
+                    condition_before: item.condition_before,
+                    subtotal: calculateLoanTotal(validated.checkout_date, validated.expected_return, [item], billingMode),
+                    rate_type: billingMode,
+                    rate_applied: rate
+                };
+            });
 
             const { error: itemsErr } = await supabase
                 .from('loan_items')
                 .insert(itemsToInsert);
 
-            if (itemsErr) throw itemsErr;
-
-            // For reserved status, we explicitly do NOT change equipment status yet.
-            // Equipment status changes to 'loaned' when the loan is explicitly moved to 'active' on the detail page.
+            if (itemsErr) {
+                console.error("Loan items insert error:", itemsErr);
+                throw itemsErr;
+            }
 
             toast.success("Réservation créée avec succès");
             router.push(`/loans/${loan.id}`);
@@ -262,11 +286,14 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Erreur de sauvegarde:", error);
-            toast.error("Erreur lors de la sauvegarde: " + error.message);
+            toast.error("Erreur lors de la sauvegarde: " + (error?.message || JSON.stringify(error)));
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    // Computed values for the recap
+    const periods = durationDays > 0 ? calculatePeriods(durationDays, billingMode) : 0;
 
     return (
         <Form {...form}>
@@ -484,13 +511,13 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                             </CardContent>
                         </Card>
 
-                        {/* SECTION 3: Période */}
+                        {/* SECTION 3: Période & Mode de facturation */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>3. Période & Notes</CardTitle>
+                                <CardTitle>3. Période &amp; Facturation</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <FormField
                                         control={form.control}
                                         name="checkout_date"
@@ -517,6 +544,24 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                             </FormItem>
                                         )}
                                     />
+                                    {/* BILLING MODE SELECTOR */}
+                                    <div>
+                                        <FormItem>
+                                            <FormLabel>Mode de facturation *</FormLabel>
+                                            <Select value={billingMode} onValueChange={(val) => setBillingMode(val as BillingMode)}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Sélectionnez un mode" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="bg-white max-h-[250px] overflow-y-auto">
+                                                    <SelectItem value="day">Par jour</SelectItem>
+                                                    <SelectItem value="week">Par semaine</SelectItem>
+                                                    <SelectItem value="month">Par mois</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormItem>
+                                    </div>
                                 </div>
                                 <FormField
                                     control={form.control}
@@ -551,6 +596,14 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                     <span className="text-slate-600">Durée calculée:</span>
                                     <span className="font-semibold text-slate-900">{durationDays} jour(s)</span>
                                 </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-600">Mode:</span>
+                                    <span className="font-semibold text-slate-900">{BILLING_MODE_LABELS[billingMode]}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-600">Périodes facturées:</span>
+                                    <span className="font-semibold text-slate-900">{periods} {BILLING_PERIOD_LABELS[billingMode]}</span>
+                                </div>
 
                                 <div className="space-y-3">
                                     <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Détails de facturation</span>
@@ -560,15 +613,21 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                                         watchItems.map((item, idx) => {
                                             if (!item.equipment_id) return null;
                                             const eqp = equipmentOptions.find(e => e.id === item.equipment_id);
-                                            const itemSub = durationDays > 0 ? calculateLoanTotal(watchCheckout, watchExpected, [item]) : 0;
+                                            const rate = getRateForMode(item, billingMode);
+                                            const itemSub = durationDays > 0 ? calculateLoanTotal(watchCheckout, watchExpected, [item], billingMode) : 0;
+                                            const qty = Number(item.quantity) || 1;
 
                                             return (
-                                                <div key={idx} className="flex justify-between text-sm py-1 border-b border-blue-100/50 last:border-0 pb-2">
-                                                    <div className="truncate pr-2 w-2/3">
-                                                        <span className="text-slate-700">{eqp?.name || 'Inconnu'}</span>
-                                                        <div className="text-xs text-slate-400">Qté: {item.quantity}</div>
+                                                <div key={idx} className="text-sm py-2 border-b border-blue-100/50 last:border-0">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-slate-700 font-medium truncate pr-2">{eqp?.name || 'Inconnu'}</span>
+                                                        <span className="font-semibold text-blue-700 whitespace-nowrap">
+                                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(itemSub)}
+                                                        </span>
                                                     </div>
-                                                    <div className="font-medium">{new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(itemSub)}</div>
+                                                    <div className="text-xs text-slate-400 mt-0.5">
+                                                        {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(rate)} × {periods} {BILLING_PERIOD_LABELS[billingMode]} × {qty} unité(s)
+                                                    </div>
                                                 </div>
                                             );
                                         })
