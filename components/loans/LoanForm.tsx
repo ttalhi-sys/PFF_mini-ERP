@@ -225,10 +225,12 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
 
             // Insert core loan record
             // DB CHECK constraint: status IN ('reserved','active','overdue','returned','cancelled')
-            // responsible_id is a FK to profiles(id) — send null if empty string
-            const responsibleValue = validated.responsible_id && validated.responsible_id.trim() !== ''
-                ? validated.responsible_id
-                : null;
+            // responsible_id is UUID FK to profiles(id) — the form field is free text,
+            // so we always send null and store the guarantor name in notes.
+            const guarantorName = validated.responsible_id?.trim() || '';
+            const notesWithGuarantor = guarantorName
+                ? `[Garant: ${guarantorName}]${validated.notes ? '\n' + validated.notes : ''}`
+                : (validated.notes || null);
 
             const { data: loan, error: loanErr } = await supabase
                 .from('loans')
@@ -239,10 +241,10 @@ export function LoanForm({ prefillCode }: LoanFormProps) {
                     borrower_phone: validated.borrower_phone || null,
                     borrower_type: validated.borrower_type,
                     borrower_org: validated.borrower_org || null,
-                    responsible_id: responsibleValue,
+                    responsible_id: null,
                     checkout_date: validated.checkout_date,
                     expected_return: validated.expected_return,
-                    notes: validated.notes || null,
+                    notes: notesWithGuarantor,
                     status: 'reserved',
                     total_amount: estimatedTotal,
                     created_by: session.user.id
