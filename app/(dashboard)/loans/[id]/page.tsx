@@ -14,7 +14,6 @@ export default async function LoanDetailPage({ params }: { params: { id: string 
         .from('loans')
         .select(`
             *,
-            borrower:borrower_id(id, full_name),
             responsible:responsible_id(id, full_name),
             creator:created_by(id, full_name),
             loan_items(
