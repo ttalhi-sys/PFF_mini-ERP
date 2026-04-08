@@ -37,34 +37,12 @@ export default function NewIncidentPage() {
         loadData()
     }, [supabase])
 
-    const handleSubmit = async (values: IncidentFormValues, files: File[]) => {
+    const handleSubmit = async (values: IncidentFormValues, evidenceUrls: string[]) => {
         try {
             setIsSubmitting(true)
 
             // 1. Generate code INC-YYYY-XXX
             const code = await generateSequentialCode(supabase, 'INC', 'sst_incidents')
-
-            // 2. Upload files if any
-            const evidence_urls: string[] = []
-            if (files && files.length > 0) {
-                for (const file of files) {
-                    const fileName = `${code}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`
-                    const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('incident-evidence')
-                        .upload(fileName, file)
-                    
-                    if (uploadError) {
-                        console.error('Upload error:', uploadError)
-                        toast.error(`Erreur d'upload pour le fichier ${file.name}`)
-                    } else if (uploadData) {
-                        // get public url
-                        const { data: { publicUrl } } = supabase.storage
-                            .from('incident-evidence')
-                            .getPublicUrl(uploadData.path)
-                        evidence_urls.push(publicUrl)
-                    }
-                }
-            }
 
             // 3. Insert record
             const { error } = await supabase
@@ -79,7 +57,7 @@ export default function NewIncidentPage() {
                     description: values.description,
                     immediate_measures: values.immediate_measures || null,
                     status: 'reported',
-                    evidence_urls: evidence_urls.length > 0 ? evidence_urls : null,
+                    evidence_urls: evidenceUrls.length > 0 ? evidenceUrls : null,
                 }])
 
             if (error) {

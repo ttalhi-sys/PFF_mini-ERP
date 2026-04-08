@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { incidentFormSchema, IncidentFormValues } from "@/lib/validators/incident.schema"
+import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -25,7 +27,7 @@ import { cn } from "@/lib/utils"
 
 interface IncidentFormProps {
     equipments: EquipmentRow[]
-    onSubmit: (data: IncidentFormValues, files: File[]) => Promise<void>
+    onSubmit: (data: IncidentFormValues, evidenceUrls: string[]) => Promise<void>
     onCancel: () => void
     isSubmitting?: boolean
 }
@@ -108,7 +110,9 @@ function EquipmentCombobox({ value, onChange, options, disabled = false }: {
 }
 
 export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = false }: IncidentFormProps) {
+    const supabase = createClient()
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+    const [isUploading, setIsUploading] = useState(false)
 
     const defaultDate = new Date()
     defaultDate.setMinutes(defaultDate.getMinutes() - defaultDate.getTimezoneOffset())
@@ -127,8 +131,36 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
         },
     })
 
-    const handleFormSubmit = (data: IncidentFormValues) => {
-        return onSubmit(data, selectedFiles)
+    const handleFormSubmit = async (data: IncidentFormValues) => {
+        try {
+            setIsUploading(true)
+            const evidence_urls: string[] = []
+
+            if (selectedFiles && selectedFiles.length > 0) {
+                for (const file of selectedFiles) {
+                    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('incident-evidence')
+                        .upload(fileName, file)
+                    
+                    if (uploadError) {
+                        console.error('Upload error in form:', uploadError)
+                        toast.error(`Erreur d'upload pour le fichier ${file.name}`)
+                    } else if (uploadData) {
+                        const { data: { publicUrl } } = supabase.storage
+                            .from('incident-evidence')
+                            .getPublicUrl(uploadData.path)
+                        evidence_urls.push(publicUrl)
+                    }
+                }
+            }
+            await onSubmit(data, evidence_urls)
+        } catch (err) {
+            console.error("Form submit error", err)
+            toast.error("Erreur inattendue", { description: "Une erreur est survenue lors du traitement." })
+        } finally {
+            setIsUploading(false)
+        }
     }
 
     return (
@@ -327,11 +359,11 @@ export function IncidentForm({ equipments, onSubmit, onCancel, isSubmitting = fa
                 </div>
 
                 <div className="flex gap-4 justify-end pt-4 border-t">
-                    <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+                    <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting || isUploading}>
                         Annuler
                     </Button>
-                    <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white" disabled={isSubmitting}>
-                        {isSubmitting ? "Enregistrement..." : "Soumettre l'incident"}
+                    <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white" disabled={isSubmitting || isUploading}>
+                        {isSubmitting || isUploading ? "Enregistrement..." : "Soumettre l'incident"}
                     </Button>
                 </div>
             </form>
