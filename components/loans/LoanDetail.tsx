@@ -112,6 +112,18 @@ export function LoanDetail({ loan }: LoanDetailProps) {
 
             if (loanErr) throw loanErr;
 
+            // Restore all equipment back to 'EN_SERVICE'
+            if (loan.loan_items) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
+                const { error: eqpErr } = await supabase
+                    .from('equipment')
+                    .update({ status: 'EN_SERVICE' })
+                    .in('id', equipmentIds);
+
+                if (eqpErr) throw eqpErr;
+            }
+
             toast.success("Réservation annulée");
             router.refresh();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
