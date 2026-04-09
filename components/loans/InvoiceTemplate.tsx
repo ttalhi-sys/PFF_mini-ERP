@@ -120,7 +120,7 @@ export function InvoiceTemplate({ loan }: InvoiceTemplateProps) {
 
             <div className="text-center text-xs text-slate-500 mt-8 pt-8 border-t">
                 <p>Merci de votre confiance. Les factures sont payables dans les 30 jours suivant leur réception.</p>
-                <p className="mt-1">Pour toute question concernant cette facture, contactez le service comptabilité au +1 555-000-1111.</p>
+                <p className="mt-1">Pour toute question concernant cette facture, contactez le service comptabilité au 514-396-8800.</p>
             </div>
         </div>
     );
