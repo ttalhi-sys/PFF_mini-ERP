@@ -84,6 +84,7 @@ export function ReturnModal({ isOpen, onClose, loan }: ReturnModalProps) {
                 if (itemErr) throw itemErr;
 
                 // Update equipment back to available and update condition
+                console.log('Updating equipment status to:', 'EN_SERVICE');
                 const { error: eqpErr } = await supabase
                     .from('equipment')
                     .update({

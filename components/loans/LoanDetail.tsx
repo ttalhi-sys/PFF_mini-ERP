@@ -76,6 +76,7 @@ export function LoanDetail({ loan }: LoanDetailProps) {
             if (loan.loan_items) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
+                console.log('Updating equipment status to:', 'PRETE');
                 const { error: eqpErr } = await supabase
                     .from('equipment')
                     .update({ status: 'PRETE' })
@@ -116,6 +117,7 @@ export function LoanDetail({ loan }: LoanDetailProps) {
             if (loan.loan_items) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
+                console.log('Updating equipment status to:', 'EN_SERVICE');
                 const { error: eqpErr } = await supabase
                     .from('equipment')
                     .update({ status: 'EN_SERVICE' })
