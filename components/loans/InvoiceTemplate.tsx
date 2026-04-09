@@ -16,18 +16,25 @@ export function InvoiceTemplate({ loan }: InvoiceTemplateProps) {
         return format(parseISO(dateString), 'dd MMMM yyyy', { locale: fr });
     };
 
+    const subtotal = loan.total_amount || 0;
+    const tps = subtotal * 0.05;
+    const tvq = subtotal * 0.09975;
+    const totalTTC = subtotal + tps + tvq;
+    
+    // Générer le code facture à partir du code emprunt si possible (EMP- -> FACT-)
+    const displayInvoiceCode = loan.code ? loan.code.replace('EMP-', 'FACT-') : loan.invoice_code;
+
     return (
         <div className="bg-white p-8 border rounded-lg shadow-sm w-full max-w-4xl mx-auto my-8">
             <div className="flex justify-between items-start border-b pb-6 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">FACTURE</h1>
-                    <p className="text-slate-500 font-mono mt-1">{loan.invoice_code}</p>
+                    <p className="text-slate-500 font-mono mt-1">{displayInvoiceCode}</p>
                 </div>
                 <div className="text-right text-slate-600 text-sm">
-                    <p className="font-bold text-slate-800">LabGFHA - Université</p>
-                    <p>123 Avenue des Sciences</p>
-                    <p>Département de Physique</p>
-                    <p>contact@labgfha.edu</p>
+                    <p className="font-bold text-slate-800">Laboratoire GFHA — ÉTS</p>
+                    <p>1100, rue Notre-Dame Ouest, Montréal, QC H3C 1K3</p>
+                    <p>514-396-8800</p>
                 </div>
             </div>
 
@@ -92,16 +99,20 @@ export function InvoiceTemplate({ loan }: InvoiceTemplateProps) {
                 <div className="w-1/2 p-4 bg-slate-50 rounded-lg border">
                     <div className="flex justify-between items-center mb-2">
                         <span className="text-slate-600">Sous-total</span>
-                        <span className="font-medium">{new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(loan.total_amount || 0)}</span>
+                        <span className="font-medium">{new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(subtotal)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-slate-600">TPS (5%)</span>
+                        <span className="font-medium">{new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(tps)}</span>
                     </div>
                     <div className="flex justify-between items-center mb-4">
-                        <span className="text-slate-600">Taxes (0%)</span>
-                        <span className="font-medium">0,00 $</span>
+                        <span className="text-slate-600">TVQ (9,975%)</span>
+                        <span className="font-medium">{new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(tvq)}</span>
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-slate-200">
-                        <span className="text-lg font-bold text-slate-900">Total à payer</span>
+                        <span className="text-lg font-bold text-slate-900">Total TTC</span>
                         <span className="text-2xl font-bold text-blue-700">
-                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(loan.total_amount || 0)}
+                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(totalTTC)}
                         </span>
                     </div>
                 </div>

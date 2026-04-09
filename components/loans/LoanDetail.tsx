@@ -355,10 +355,34 @@ export function LoanDetail({ loan }: LoanDetailProps) {
 
                                     <TableRow className="bg-slate-50 border-t-2">
                                         <TableCell colSpan={isReturned ? 5 : 4} className="text-right font-bold text-slate-700">
-                                            Total
+                                            Sous-total
+                                        </TableCell>
+                                        <TableCell className="text-right font-medium text-slate-900">
+                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(loan.total_amount || 0)}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow className="bg-slate-50">
+                                        <TableCell colSpan={isReturned ? 5 : 4} className="text-right font-bold text-slate-700">
+                                            TPS (5%)
+                                        </TableCell>
+                                        <TableCell className="text-right font-medium text-slate-900">
+                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format((loan.total_amount || 0) * 0.05)}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow className="bg-slate-50">
+                                        <TableCell colSpan={isReturned ? 5 : 4} className="text-right font-bold text-slate-700">
+                                            TVQ (9,975%)
+                                        </TableCell>
+                                        <TableCell className="text-right font-medium text-slate-900">
+                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format((loan.total_amount || 0) * 0.09975)}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow className="bg-slate-100 border-t-2">
+                                        <TableCell colSpan={isReturned ? 5 : 4} className="text-right font-bold text-slate-900">
+                                            Total estimé (TTC)
                                         </TableCell>
                                         <TableCell className="text-right font-bold text-blue-700 text-lg">
-                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(loan.total_amount || 0)}
+                                            {new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format((loan.total_amount || 0) * 1.14975)}
                                         </TableCell>
                                     </TableRow>
                                 </TableBody>
