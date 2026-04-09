@@ -76,10 +76,11 @@ export function LoanDetail({ loan }: LoanDetailProps) {
             if (loan.loan_items) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
-                console.log('Updating equipment status to:', 'PRETE');
+                const payload = { status: 'PRETE' };
+                console.log('Full equipment update payload:', payload);
                 const { error: eqpErr } = await supabase
                     .from('equipment')
-                    .update({ status: 'PRETE' })
+                    .update(payload)
                     .in('id', equipmentIds);
 
                 if (eqpErr) throw eqpErr;
@@ -117,10 +118,11 @@ export function LoanDetail({ loan }: LoanDetailProps) {
             if (loan.loan_items) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const equipmentIds = loan.loan_items.map((i: any) => i.equipment_id);
-                console.log('Updating equipment status to:', 'EN_SERVICE');
+                const payload = { status: 'EN_SERVICE' };
+                console.log('Full equipment update payload:', payload);
                 const { error: eqpErr } = await supabase
                     .from('equipment')
-                    .update({ status: 'EN_SERVICE' })
+                    .update(payload)
                     .in('id', equipmentIds);
 
                 if (eqpErr) throw eqpErr;
