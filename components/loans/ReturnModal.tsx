@@ -114,8 +114,13 @@ export function ReturnModal({ isOpen, onClose, loan }: ReturnModalProps) {
     if (!loan || !loan.loan_items) return null;
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px]">
+        <>
+            {/* Custom dark overlay properly separated from content */}
+            {isOpen && (
+                <div className="fixed inset-0 z-40 bg-black/50 pointer-events-none" aria-hidden="true" />
+            )}
+            <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogContent className="sm:max-w-[500px] bg-white rounded-lg shadow-xl z-50">
                 <DialogHeader>
                     <DialogTitle>Enregistrer le retour</DialogTitle>
                     <DialogDescription>
@@ -172,6 +177,7 @@ export function ReturnModal({ isOpen, onClose, loan }: ReturnModalProps) {
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+        </>
     );
 }
 
