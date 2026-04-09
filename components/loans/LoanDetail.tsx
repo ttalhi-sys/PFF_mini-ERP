@@ -18,6 +18,8 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { ReturnModal } from './ReturnModal';
 import { InvoiceTemplate } from './InvoiceTemplate';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface LoanDetailProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,6 +141,29 @@ export function LoanDetail({ loan }: LoanDetailProps) {
         }
     };
 
+    const handleDownloadPDF = async () => {
+        const element = document.getElementById('facture-section');
+        if (!element) {
+            toast.error("Section facture introuvable");
+            return;
+        }
+
+        try {
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`Facture_${loan.invoice_code || loan.code}.pdf`);
+        } catch (error) {
+            console.error("Erreur lors de la génération du PDF:", error);
+            toast.error("Erreur lors de la génération du PDF");
+        }
+    };
+
     return (
         <div className="space-y-6 pb-12 w-full max-w-6xl">
             {/* Header Area */}
@@ -194,7 +219,7 @@ export function LoanDetail({ loan }: LoanDetailProps) {
                     )}
 
                     {isReturned && loan.invoice_code && (
-                        <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50" onClick={handleDownloadPDF}>
                             <Download className="h-4 w-4 mr-2" />
                             Télécharger Facture PDF
                         </Button>
@@ -343,7 +368,7 @@ export function LoanDetail({ loan }: LoanDetailProps) {
 
                     {/* Visually stunning Invoice section if returned */}
                     {isReturned && loan.invoice_code && (
-                        <div className="mt-8">
+                        <div id="facture-section" className="mt-8 bg-white p-2 rounded-lg">
                             <InvoiceTemplate loan={loan} />
                         </div>
                     )}
